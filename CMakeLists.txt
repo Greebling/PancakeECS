@@ -6,10 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 # Flags
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-g")
 
-
-# HashMap Library
-include_directories(libs/robin-map/include)
-
 set(SOURCE_FILES src/ECSManager.cpp src/ECSManager.h
         src/ComponentView.h src/ComponentData.h
         src/GameObject.cpp src/GameObject.h
@@ -19,4 +15,3 @@ set(SOURCE_FILES src/ECSManager.cpp src/ECSManager.h
         main.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
-#add_executable(${PROJECT_NAME} ${SOURCE_FILES})
