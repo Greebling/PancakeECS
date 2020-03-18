@@ -1,0 +1,2 @@
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe qc libPancakeECS.a  CMakeFiles/PancakeECS.dir/src/ECSManager.cpp.obj CMakeFiles/PancakeECS.dir/src/GameObject.cpp.obj CMakeFiles/PancakeECS.dir/src/TypeId.cpp.obj CMakeFiles/PancakeECS.dir/src/Scene.cpp.obj CMakeFiles/PancakeECS.dir/src/ComponentViewBase.cpp.obj CMakeFiles/PancakeECS.dir/main.cpp.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ranlib.exe libPancakeECS.a

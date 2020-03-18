@@ -1,0 +1,2 @@
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe qc libPfannkuchenECS.a  CMakeFiles/PfannkuchenECS.dir/ECSManager.cpp.obj CMakeFiles/PfannkuchenECS.dir/GameObject.cpp.obj CMakeFiles/PfannkuchenECS.dir/TypeId.cpp.obj CMakeFiles/PfannkuchenECS.dir/physics/RectangleCollider.cpp.obj CMakeFiles/PfannkuchenECS.dir/physics/Rigidbody.cpp.obj CMakeFiles/PfannkuchenECS.dir/Scene.cpp.obj CMakeFiles/PfannkuchenECS.dir/ComponentViewBase.cpp.obj CMakeFiles/PfannkuchenECS.dir/main.cpp.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ranlib.exe libPfannkuchenECS.a

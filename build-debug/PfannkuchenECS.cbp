@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="PfannkuchenECS"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="D:/Code Projects/PancakeECS/build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="PfannkuchenECS">
+				<Option output="D:/Code Projects/PancakeECS/build-debug/libPfannkuchenECS.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="D:/Code Projects/PancakeECS/build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="D:/Code Projects/PancakeECS/../../libs/robin-map/include"/>
+					<Add directory="D:/Code Projects/PancakeECS/../../libs/SFML-2.5.1/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 PfannkuchenECS"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="PfannkuchenECS/fast">
+				<Option output="D:/Code Projects/PancakeECS/build-debug/libPfannkuchenECS.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="D:/Code Projects/PancakeECS/build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="D:/Code Projects/PancakeECS/../../libs/robin-map/include"/>
+					<Add directory="D:/Code Projects/PancakeECS/../../libs/SFML-2.5.1/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/7.3.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 PfannkuchenECS/fast"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="D:/Code Projects/PancakeECS/build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="D:/Code Projects/PancakeECS/build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;D:/Code Projects/PancakeECS/build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="D:/Code Projects/PancakeECS/ComponentData.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/ComponentView.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/ComponentViewBase.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/ComponentViewBase.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/ECSManager.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/ECSManager.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/GameObject.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/GameObject.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/Scene.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/Scene.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/Transform.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/TypeDefs.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/TypeId.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/TypeId.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/main.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/physics/Collider.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/physics/HitInfo.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/physics/RectangleCollider.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/physics/RectangleCollider.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/physics/Rigidbody.cpp">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/physics/Rigidbody.h">
+			<Option target="PfannkuchenECS"/>
+		</Unit>
+		<Unit filename="D:/Code Projects/PancakeECS/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
