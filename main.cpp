@@ -1,7 +1,3 @@
-//
-// Created by B98 on 18.02.2020.
-//
-
 #include "src/ComponentView.h"
 #include "src/GameObject.h"
 #include "src/Scene.h"
