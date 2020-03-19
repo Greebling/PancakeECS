@@ -2,19 +2,19 @@
 
 #include "Scene.h"
 
-Scene *Scene::activeScene = nullptr;
+Scene *Scene::ACTIVE_SCENE = nullptr;
 
 Scene::Scene()
         : manager() {
-    if (activeScene == nullptr)
-        activeScene = this;
+    if (ACTIVE_SCENE == nullptr)
+	    ACTIVE_SCENE = this;
 }
 
 Scene::~Scene() {
-    if (this == activeScene)
-        activeScene = nullptr;
+    if (this == ACTIVE_SCENE)
+	    ACTIVE_SCENE = nullptr;
 }
 
 void Scene::SetActive() {
-    activeScene = this;
+	ACTIVE_SCENE = this;
 }

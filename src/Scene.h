@@ -7,7 +7,7 @@
 
 class Scene {
 public:
-    static Scene *activeScene;
+    static Scene *ACTIVE_SCENE;
 
     ECSManager manager;
 

@@ -84,9 +84,9 @@ protected:
 template<typename... ComponentTypes>
 ComponentView<ComponentTypes...>::ComponentView()
 		:
-		ComponentView(Scene::activeScene->manager)
+		ComponentView(Scene::ACTIVE_SCENE->manager)
 {
-	assert(Scene::activeScene != nullptr && "No active scene was found!");
+	assert(Scene::ACTIVE_SCENE != nullptr && "No active scene was found!");
 }
 
 template<typename... ComponentTypes>

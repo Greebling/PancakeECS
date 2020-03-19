@@ -22,9 +22,9 @@ private:
 public:
     /// Creates a GameObject within the current scene
     GameObject()
-            : manager(Scene::activeScene->manager),
-              _id(Scene::activeScene->manager.AddEntity()) {
-        assert(Scene::activeScene != nullptr && "A scene must be active before instantiating a GameObject");
+            : manager(Scene::ACTIVE_SCENE->manager),
+              _id(Scene::ACTIVE_SCENE->manager.AddEntity()) {
+        assert(Scene::ACTIVE_SCENE != nullptr && "A scene must be active before instantiating a GameObject");
     }
 
     explicit GameObject(Scene &scene)
