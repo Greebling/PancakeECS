@@ -1,5 +1,3 @@
-// Created on 19.12.2019.
-
 #pragma once
 
 #include <cassert>
@@ -8,62 +6,74 @@
 #include "Scene.h"
 
 
-class GameObject {
+/// A wrapper class for an Entity
+/// Has convenient methods for adding and removing components and takes care of their disposal automatically
+/// May be inherited from
+class GameObject
+{
 public:
-    std::string name;
+	/// Creates a GameObject within the current scene
+	GameObject()
+			: scene(*Scene::ACTIVE_SCENE)
+			  , manager(Scene::ACTIVE_SCENE->manager)
+			  , _id(Scene::ACTIVE_SCENE->manager.AddEntity())
+	{
+		assert(Scene::ACTIVE_SCENE != nullptr && "A scene must be active before instantiating a GameObject");
+	}
+	
+	
+	explicit GameObject(Scene &scene)
+			: scene(scene)
+			  , manager(scene.manager)
+			  , _id(scene.manager.AddEntity())
+	{
+	}
+	
+	virtual ~GameObject()
+	{
+		manager.DestroyEntity(_id);
+	}
+	
+	
+	/// The entityID of the GameObject
+	/// \return
+	[[nodiscard]] EntityID Id() const
+	{
+		return _id;
+	}
+	
+	
+	/// Returns the given component of the GameActor
+	/// \tparam ComponentType
+	/// \return A pointer to the component
+	template<typename ComponentType>
+	ComponentPointer<ComponentType> Component()
+	{
+		static_assert(std::is_base_of_v<ComponentData, ComponentType>,
+		              "ComponentType has to derive from ComponentData!");
+		
+		return manager.GetComponent<ComponentType>(_id);
+	}
+	
+	
+	/// Adds the given ComponentType that belongs to the given id
+	/// \tparam ComponentType Deriving from ComponentData
+	/// \param id Owner of the Component
+	/// \return A pointer to the component
+	template<typename ComponentType>
+	ComponentPointer<ComponentType> AddComponent()
+	{
+		
+		return manager.AddComponent<ComponentType>(_id);
+	}
 
 protected:
-    ECSManager &manager;
+	/// The ECS Manager the GameObject is bound to
+	ECSManager &manager;
+	
+	/// The scene the GameObject lives in
+	Scene &scene;
 
 private:
-    const EntityID _id;
-
-
-public:
-    /// Creates a GameObject within the current scene
-    GameObject()
-            : manager(Scene::ACTIVE_SCENE->manager),
-              _id(Scene::ACTIVE_SCENE->manager.AddEntity()) {
-        assert(Scene::ACTIVE_SCENE != nullptr && "A scene must be active before instantiating a GameObject");
-    }
-
-    explicit GameObject(Scene &scene)
-            : manager(scene.manager), _id(scene.manager.AddEntity()) {
-    }
-
-    virtual ~GameObject();
-
-
-    /// The entityID of the actor
-    /// \return
-    [[nodiscard]] EntityID Id() const;
-
-
-    /// Returns the given component of the GameActor
-    /// \tparam ComponentType
-    /// \return A pointer to the component
-    template<typename ComponentType>
-    ComponentPointer<ComponentType> Component();
-
-
-    /// Adds the given ComponentType that belongs to the given id
-    /// \tparam ComponentType Deriving from ComponentData
-    /// \param id Owner of the Component
-    /// \return A pointer to the component
-    template<typename ComponentType>
-    ComponentPointer<ComponentType> AddComponent();
+	const EntityID _id;
 };
-
-
-template<typename ComponentType>
-ComponentPointer<ComponentType> GameObject::Component() {
-    static_assert(std::is_base_of_v<ComponentData, ComponentType>,
-                  "ComponentType has to derive from ComponentData!");
-
-    return manager.GetComponent<ComponentType>(_id);
-}
-
-template<typename ComponentType>
-ComponentPointer<ComponentType> GameObject::AddComponent() {
-    return manager.AddComponent<ComponentType>(_id);
-}

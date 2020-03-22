@@ -1,21 +1,20 @@
-// Created on 05.02.2020.
-
 #pragma once
 
 
 #include "ECSManager.h"
 
-class Scene {
+class Scene
+{
 public:
-    static Scene *ACTIVE_SCENE;
-
-    ECSManager manager;
+	static Scene *ACTIVE_SCENE;
+	
+	ECSManager manager;
 
 public:
-    Scene();
-
-    ~Scene();
-
-    /// Marks this scene as the currently active one
-    void SetActive();
+	Scene();
+	
+	~Scene();
+	
+	/// Marks this scene as the currently active one
+	void SetActive();
 };

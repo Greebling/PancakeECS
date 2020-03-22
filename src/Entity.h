@@ -1,13 +1,13 @@
-#pragma once
+# pragma once
 
 #include "EntityID.h"
 
-struct ComponentData
+class Entity
 {
 public:
 	EntityID id;
 	
-	bool IsAlive() const
+	[[nodiscard]] bool IsAlive() const
 	{
 		return id.IsAlive();
 	}

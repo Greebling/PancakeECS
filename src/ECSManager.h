@@ -3,21 +3,14 @@
 #include <queue>
 #include <cassert>
 #include "../libs/robin-map/include/tsl/robin_map.h"
+
 #include "ComponentData.h"
 #include "EntityID.h"
 #include "ComponentVector.h"
 #include "TypeId.h"
 #include "ComponentViewBase.h"
+#include "Entity.h"
 
-class Entity
-{
-public:
-	EntityID id;
-	
-	[[nodiscard]] bool IsAlive() const;
-};
-
-////////////////////////////////////////////////////////
 
 class ECSManager;
 
@@ -36,7 +29,7 @@ struct ComponentPointer
 	
 	EntityID id;
 	
-	bool IsValid() const;
+	[[nodiscard]] bool IsValid() const;
 	
 	/// Not recommended to use this as a raw pointer to a component might be i
 	/// invalidated by adding new components of the same type
@@ -69,30 +62,6 @@ public:
 	
 	~ECSManager();
 
-private:
-	template<typename>
-	friend
-	struct ComponentPointer;
-	
-	template<typename ...>
-	friend
-	class ComponentView;
-	
-	/// The list of entities the system might hold
-	std::vector<Entity> *_entities;
-	
-	/// list of indices where entities were deleted
-	std::deque<IndexType> *_deletedIndices;
-	
-	/// Maps the componentVectors to a given ComponentId that they are holding as a type
-	tsl::robin_map<ComponentId, ComponentVectorBase *> _componentVectors;
-	
-	/// Maps the componentSystems to a given ComponentId that they are interested in
-	tsl::robin_map<ComponentId, std::vector<ComponentViewBase *> > _componentSystems;
-	
-	/// place where the last insert of a new entity happened (if no index of _deletedIndices was used)
-	IndexType _lastInsert{1};
-
 public:
 	Entity *GetEntity(EntityID id);
 	
@@ -119,10 +88,32 @@ public:
 	template<typename ComponentType>
 	ComponentPointer<ComponentType> GetComponent(EntityID id);
 	
-	ComponentVectorBase *GetComponentsBase(ComponentId componentType);
-	
 	template<typename ComponentType>
 	void RemoveComponent(EntityID id);
+
+private:
+	/// The list of entities the system might hold
+	std::vector<Entity> *_entities;
+	
+	/// list of indices where entities were deleted
+	std::deque<IndexType> *_deletedIndices;
+	
+	/// Maps the componentVectors to a given ComponentId that they are holding as a type
+	tsl::robin_map<ComponentId, ComponentVectorBase *> _componentVectors;
+	
+	/// Maps the componentSystems to a given ComponentId that they are interested in
+	tsl::robin_map<ComponentId, std::vector<ComponentViewBase *> > _componentSystems;
+	
+	/// place where the last insert of a new entity happened (if no index of _deletedIndices was used)
+	IndexType _lastInsert{1};
+	
+	template<typename>
+	friend
+	struct ComponentPointer;
+	
+	template<typename ...>
+	friend
+	class ComponentView;
 
 private:
 	
@@ -137,18 +128,31 @@ private:
 	template<typename ComponentType>
 	ComponentVector<ComponentType> *GetComponents();
 	
+	/// Similar to GetComponents, but returns only the ComponentVectorBase
+	/// \param componentType
+	/// \return
+	ComponentVectorBase *GetComponentsBase(ComponentId componentType);
+	
 	/// Returns the given component of the Entity
 	/// \tparam ComponentType Deriving from ComponentData
 	/// \return A pointer to the component or nullptr if the GameActor did not have the ComponentType
 	template<typename ComponentType>
 	ComponentType *GetComponentDirect(EntityID id);
 	
+	/// Updates all ComponentViews active about newly added components
+	/// \param componentType
+	/// \param id
 	void NotifyOnAdd(ComponentId componentType, EntityID id);
 	
+	///  Updates all ComponentViews active about newly removed components
+	/// \param componentType
+	/// \param id
 	void NotifyOnRemove(ComponentId componentType, EntityID id);
 };
 
 
+////////////////////////////////////////////////////////
+// ComponentPointer implementations
 ////////////////////////////////////////////////////////
 
 template<typename ComponentType>
@@ -181,7 +185,6 @@ ComponentPointer<ComponentType>::ComponentPointer(const ComponentPointer &pointe
 		 , _manager(pointer._manager)
 {
 }
-
 
 template<typename ComponentType>
 ComponentType *ComponentPointer<ComponentType>::RawPointer()
@@ -242,6 +245,8 @@ bool ComponentPointer<ComponentType>::IsValid() const
 	return id.IsAlive() && (_manager->GetComponentDirect<ComponentType>(id));
 }
 
+////////////////////////////////////////////////////////
+// ECSManager implementations
 ////////////////////////////////////////////////////////
 
 template<typename ComponentType>
