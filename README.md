@@ -5,7 +5,10 @@
 At the heart of this C++17 library is the `ECSManager` class: It takes care of saving all components in their respective `ComponentVectors`. It is designed to increase data locality as much as possible while keeping memory usage as low as possible. 
 
 # Usage
-To make use of PancakeECS one only needs to declare a new `Scene`. All `GameObjects` that will be declared will be created within the scope of the active scene. Components can be easily added and removed to `GameObjects` using the `AddComponent<>` and `RemoveComponent<>` methods. 
+One example of how this library might be used can be found in main.cpp
+
+To make use of PancakeECS one only needs to declare a new `Scene`. 
+All `GameObjects` that will be instantiated will be created within the scope of the active scene if not declared otherwise. Components can be easily added and removed to `GameObjects` using the `AddComponent<>` and `RemoveComponent<>` methods.
 
 `ComponentViews` allow for easy iteration over ComponentDatas. Multithreading is made easy by means of `parallel_foreach` of a ComponentView.
 
