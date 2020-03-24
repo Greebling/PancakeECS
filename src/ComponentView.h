@@ -46,10 +46,6 @@ public:
 	/// \param func lambdaFunction
 	void Foreach(std::function<void(ComponentTypes &...)> func);
 	
-	/// Applies func for every component in the view.
-	/// \param func lambdaFunction
-	void Foreach(void (*func)(ComponentTypes &...));
-	
 	/// Applies func for every component in the view using all possible threads. Note that only functions that
 	/// only modify the current component are legal to use in parallel_foreach
 	/// \param func
@@ -63,6 +59,17 @@ protected:
 	/// \param type
 	/// \return
 	bool IsInterested(ComponentId type);
+	
+	
+	/// Puts the parameters into func
+	/// \tparam Is List of Integers deducted from seq
+	/// \param func The function the parameters shall be applied
+	/// \param indices The indices used for ComponentTypes...
+	/// \param seq  The integer sequence with length equal to sizeOf...(ComponentTypes)
+	template<size_t... Is>
+	void ApplyFunction(std::function<void(ComponentTypes &...)> &func,
+	                   std::tuple<ComponentVector<ComponentTypes> &...> &compVectors,
+	                   const vector<IndexType> &indices, index_sequence<Is...> seq);
 
 protected:
 	UpdateType _currUpdateMode{UpdateType::Automatic}; // TODO: Implement function to change the way views are updated
@@ -164,57 +171,30 @@ bool ComponentView<ComponentTypes...>::IsInterested(ComponentId type)
 	return false;
 }
 
+template<typename... ComponentTypes>
+template<size_t... Is>
+void ComponentView<ComponentTypes...>::ApplyFunction(std::function<void(ComponentTypes &...)> &func,
+                                                     std::tuple<ComponentVector<ComponentTypes> &...> &compVectors,
+                                                     const vector<IndexType> &indices, index_sequence<Is...> seq)
+{
+	std::tuple<ComponentTypes...> typeTuple; // used for getting the nth type
+	
+	func((get<Is>(compVectors)[indices[Is]])...);
+}
+
 
 template<typename... ComponentTypes>
 void ComponentView<ComponentTypes...>::Foreach(std::function<void(ComponentTypes &...)> func)
 {
-	// push back indices in case there is another upper foreach that called this foreach
-	int componentIndex = 0;
-	((ComponentVector<ComponentTypes>::index = componentIndex,
-			ComponentVector<ComponentTypes>::savedIndices.push_back(componentIndex++))
-			, ...);
+	auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
 	
+	// the componentVectors the iterate over
+	std::tuple<ComponentVector<ComponentTypes> &...> compVectors{*_manager.GetComponents<ComponentTypes>()...};
 	
-	// apply function
 	for (const vector<IndexType> &currVec : (*_vectoredEntities))
 	{
-		func(
-				((*(_manager.GetComponents<ComponentTypes>()))
-				[currVec[ComponentVector<ComponentTypes>::index]])...
-		);
+		ApplyFunction(func, compVectors, currVec, seq);
 	}
-	
-	
-	// pop back indices for the upper foreach
-	((ComponentVector<ComponentTypes>::index = ComponentVector<ComponentTypes>::savedIndices.back(),
-			ComponentVector<ComponentTypes>::savedIndices.pop_back())
-			, ...);
-}
-
-template<typename... ComponentTypes>
-void ComponentView<ComponentTypes...>::Foreach(void (*func)(ComponentTypes &...))
-{
-	// push back indices in case there is another upper foreach that called this foreach
-	int componentIndex = 0;
-	((ComponentVector<ComponentTypes>::index = componentIndex,
-			ComponentVector<ComponentTypes>::savedIndices.push_back(componentIndex++))
-			, ...);
-	
-	
-	// apply function
-	for (const vector<IndexType> &currVec : (*_vectoredEntities))
-	{
-		func(
-				((*(_manager.GetComponents<ComponentTypes>()))
-				[currVec[ComponentVector<ComponentTypes>::index]])...
-		);
-	}
-	
-	
-	// pop back indices for the upper foreach
-	((ComponentVector<ComponentTypes>::index = ComponentVector<ComponentTypes>::savedIndices.back(),
-			ComponentVector<ComponentTypes>::savedIndices.pop_back())
-			, ...);
 }
 
 template<typename... ComponentTypes>
@@ -238,26 +218,25 @@ ComponentView<ComponentTypes...>::Parallel_foreach(std::function<void(ComponentT
 	std::mutex mutex;
 	std::unique_lock<std::mutex> lock(mutex);
 	
-	int componentIndex = 0;
-	((ComponentVector<ComponentTypes>::index = componentIndex++), ...);
 	
-	
+	std::tuple<ComponentVector<ComponentTypes> &...> compVectors{*_manager.GetComponents<ComponentTypes>()...};
 	for (int j = 0; j < nThreads; ++j)
 	{
 		int start = j * (vectorSize / nThreads);
 		int end = std::min((j + 1) * (vectorSize / nThreads), vectorSize);
 		
-		tPool.push([&func, start, end, &nDone, this](int id)
+		tPool.push([&](int id)
 		           {
+			           auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
+			
+			
 			           for (int i = start; i < end; ++i)
 			           {
 				           auto &currVec = (*_vectoredEntities)[i];
 				
-				           func(
-						           ((*(_manager.GetComponents<ComponentTypes>()))
-						           [currVec[ComponentVector<ComponentTypes>::index]])...
-				           );
+				           ApplyFunction(func, compVectors, currVec, seq);
 			           }
+			
 			
 			           nDone++;
 			           suspendCV.notify_one();

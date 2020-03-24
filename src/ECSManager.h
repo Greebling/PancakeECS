@@ -309,7 +309,6 @@ ComponentPointer<ComponentType> ECSManager::GetComponent(EntityID id)
 	return ComponentPointer<ComponentType>(id, *this);
 }
 
-
 template<typename ComponentType>
 ComponentVector<ComponentType> *ECSManager::GetComponents()
 {

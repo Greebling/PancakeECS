@@ -15,3 +15,4 @@ set(SOURCE_FILES src/ECSManager.cpp src/ECSManager.h
         main.cpp src/Entity.h)
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
+#add_executable(${PROJECT_NAME} ${SOURCE_FILES})

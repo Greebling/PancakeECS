@@ -36,7 +36,7 @@ int main()
 	// iterate over the componentDatas we declared earlier
 	testView.Foreach([&](TestData0 &data0, TestData1 &data1)
 	                 {
-		                 printf("Index is %i\n", data0.id.Index());
+		                 printf("Index is %i and %i\n", data0.id.Index(), data1.id.Index());
 	                 });
 	
 	return 0;

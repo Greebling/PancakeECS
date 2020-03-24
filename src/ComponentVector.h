@@ -63,10 +63,6 @@ private:
 	friend
 	class ComponentView;
 	
-	static unsigned int index;
-	static inline std::vector<unsigned int> savedIndices = std::vector<unsigned int>();
-	
-	
 	std::vector<ComponentType> *_components;
 
 public:
@@ -125,6 +121,3 @@ public:
 		return (*entityIndex)[id];
 	}
 };
-
-template<typename ComponentType>
-unsigned int ComponentVector<ComponentType>::index = 0;
