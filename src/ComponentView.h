@@ -68,9 +68,13 @@ protected:
 	/// \param indices The indices used for ComponentTypes...
 	/// \param seq  The integer sequence with length equal to sizeOf...(ComponentTypes)
 	template<size_t... Is>
-	void ApplyFunction(std::function<void(ComponentTypes &...)> &func,
-	                   std::tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
-	                   const vector<IndexType> &indices, index_sequence<Is...> seq);
+	constexpr inline void ApplyFunction(const std::function<void(ComponentTypes &...)> &func,
+	                                    const std::tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
+	                                    const vector<IndexType> &indices,
+	                                    const index_sequence<Is...> seq)
+	{
+		func((get<Is>(ComponentVectors)[indices[Is]])...);
+	}
 
 protected:
 	UpdateType _currUpdateMode{UpdateType::Automatic}; // TODO: Implement function to change the way views are updated
@@ -172,23 +176,15 @@ bool ComponentView<ComponentTypes...>::IsInterested(ComponentId type)
 	return false;
 }
 
-template<typename... ComponentTypes>
-template<size_t... Is>
-void ComponentView<ComponentTypes...>::ApplyFunction(std::function<void(ComponentTypes &...)> &func,
-                                                     std::tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
-                                                     const vector<IndexType> &indices, index_sequence<Is...> seq)
-{
-	func((get<Is>(ComponentVectors)[indices[Is]])...);
-}
-
 
 template<typename... ComponentTypes>
-void ComponentView<ComponentTypes...>::Foreach(std::function<void(ComponentTypes &...)> func)
+void ComponentView<ComponentTypes...>::Foreach(const std::function<void(ComponentTypes &...)> func)
 {
-	auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
+	constexpr auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
 	
 	// the componentVectors the iterate over
 	std::tuple<ComponentVector<ComponentTypes> &...> compVectors{*_manager.GetComponents<ComponentTypes>()...};
+	
 	
 	for (const vector<IndexType> &currVec : (*_vectoredEntities))
 	{
@@ -226,7 +222,7 @@ ComponentView<ComponentTypes...>::Parallel_foreach(std::function<void(ComponentT
 		
 		tPool.push([&](int id)
 		           {
-			           auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
+			           constexpr auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
 			
 			
 			           for (int i = start; i < end; ++i)
