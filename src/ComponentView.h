@@ -64,11 +64,12 @@ protected:
 	/// Puts the parameters into func
 	/// \tparam Is List of Integers deducted from seq
 	/// \param func The function the parameters shall be applied
+	/// \param ComponentVectors The componentVectors containing the ComponentTypes
 	/// \param indices The indices used for ComponentTypes...
 	/// \param seq  The integer sequence with length equal to sizeOf...(ComponentTypes)
 	template<size_t... Is>
 	void ApplyFunction(std::function<void(ComponentTypes &...)> &func,
-	                   std::tuple<ComponentVector<ComponentTypes> &...> &compVectors,
+	                   std::tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
 	                   const vector<IndexType> &indices, index_sequence<Is...> seq);
 
 protected:
@@ -174,12 +175,10 @@ bool ComponentView<ComponentTypes...>::IsInterested(ComponentId type)
 template<typename... ComponentTypes>
 template<size_t... Is>
 void ComponentView<ComponentTypes...>::ApplyFunction(std::function<void(ComponentTypes &...)> &func,
-                                                     std::tuple<ComponentVector<ComponentTypes> &...> &compVectors,
+                                                     std::tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
                                                      const vector<IndexType> &indices, index_sequence<Is...> seq)
 {
-	std::tuple<ComponentTypes...> typeTuple; // used for getting the nth type
-	
-	func((get<Is>(compVectors)[indices[Is]])...);
+	func((get<Is>(ComponentVectors)[indices[Is]])...);
 }
 
 
