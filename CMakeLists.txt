@@ -3,8 +3,6 @@ set(PROJECT_NAME "PancakeECS")
 project(${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 17)
 
-# Flags
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-g")
 
 set(SOURCE_FILES src/ECSManager.cpp src/ECSManager.h
         src/ComponentView.h src/ComponentData.h
@@ -12,7 +10,8 @@ set(SOURCE_FILES src/ECSManager.cpp src/ECSManager.h
         src/TypeId.h
         src/Scene.cpp src/Scene.h
         src/ComponentViewBase.h
-        main.cpp src/Entity.h)
+        src/Entity.h
+        main.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 #add_executable(${PROJECT_NAME} ${SOURCE_FILES})
