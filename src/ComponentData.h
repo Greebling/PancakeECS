@@ -2,12 +2,17 @@
 
 #include "EntityID.h"
 
+class ECSManager;
+
 struct ComponentData
 {
 public:
-	EntityID id;
+	ComponentData() = default;
 	
-	bool IsAlive() const
+	EntityID id;
+	ECSManager *manager{nullptr};
+	
+	[[nodiscard]] bool IsAlive() const
 	{
 		return id.IsAlive();
 	}

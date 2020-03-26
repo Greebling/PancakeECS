@@ -17,15 +17,17 @@ class ECSManager;
 /// A wrapper for a pointer to a component living in a ComponentVector
 /// \tparam ComponentType The type of the component it is pointing to
 template<typename ComponentType>
-struct ComponentPointer
+struct ComponentHandle
 {
-	ComponentPointer();
+	ComponentHandle();
 	
-	ComponentPointer(EntityID id, ECSManager &manager);
+	ComponentHandle(EntityID id, ECSManager &manager);
 	
-	explicit ComponentPointer(ECSManager &manager);
+	explicit ComponentHandle(ECSManager &manager);
 	
-	ComponentPointer(const ComponentPointer &pointer);
+	explicit ComponentHandle(ComponentType &component);
+	
+	ComponentHandle(const ComponentHandle &pointer);
 	
 	EntityID id;
 	
@@ -79,14 +81,14 @@ public:
 	/// \param id Owner of the Component
 	/// \return
 	template<typename ComponentType>
-	ComponentPointer<ComponentType> AddComponent(EntityID id);
+	ComponentHandle<ComponentType> AddComponent(EntityID id);
 	
-	/// Returns a ComponentPointer to the Component that is owned by the id.
+	/// Returns a ComponentHandle to the Component that is owned by the id.
 	/// \tparam ComponentType
 	/// \param id
 	/// \return
 	template<typename ComponentType>
-	ComponentPointer<ComponentType> GetComponent(EntityID id);
+	ComponentHandle<ComponentType> GetComponent(EntityID id);
 	
 	template<typename ComponentType>
 	void RemoveComponent(EntityID id);
@@ -109,7 +111,7 @@ private:
 	
 	template<typename>
 	friend
-	struct ComponentPointer;
+	struct ComponentHandle;
 	
 	template<typename ...>
 	friend
@@ -152,11 +154,11 @@ private:
 
 
 ////////////////////////////////////////////////////////
-// ComponentPointer implementations
+// ComponentHandle implementations
 ////////////////////////////////////////////////////////
 
 template<typename ComponentType>
-ComponentPointer<ComponentType>::ComponentPointer()
+ComponentHandle<ComponentType>::ComponentHandle()
 		:id()
 		 , _manager(nullptr)
 {
@@ -164,7 +166,7 @@ ComponentPointer<ComponentType>::ComponentPointer()
 }
 
 template<typename ComponentType>
-ComponentPointer<ComponentType>::ComponentPointer(EntityID id, ECSManager &manager)
+ComponentHandle<ComponentType>::ComponentHandle(EntityID id, ECSManager &manager)
 		: id(id)
 		  , _manager(&manager)
 {
@@ -173,74 +175,81 @@ ComponentPointer<ComponentType>::ComponentPointer(EntityID id, ECSManager &manag
 }
 
 template<typename ComponentType>
-ComponentPointer<ComponentType>::ComponentPointer(ECSManager &manager)
+ComponentHandle<ComponentType>::ComponentHandle(ECSManager &manager)
 		: id(0, 0)
 		  , _manager(&manager)
 {
 }
 
 template<typename ComponentType>
-ComponentPointer<ComponentType>::ComponentPointer(const ComponentPointer &pointer)
+ComponentHandle<ComponentType>::ComponentHandle(ComponentType &component)
+		:id(component.id)
+		 , _manager(*component.manager)
+{
+}
+
+template<typename ComponentType>
+ComponentHandle<ComponentType>::ComponentHandle(const ComponentHandle &pointer)
 		:id(pointer.id)
 		 , _manager(pointer._manager)
 {
 }
 
 template<typename ComponentType>
-ComponentType *ComponentPointer<ComponentType>::RawPointer()
+ComponentType *ComponentHandle<ComponentType>::RawPointer()
 {
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
-	assert(componentP != nullptr && "ComponentPointer is invalid");
+	assert(componentP != nullptr && "ComponentHandle is invalid");
 	return componentP;
 }
 
 
 template<typename ComponentType>
-ComponentType &ComponentPointer<ComponentType>::operator*()
+ComponentType &ComponentHandle<ComponentType>::operator*()
 {
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
-	assert(componentP != nullptr && "ComponentPointer is invalid");
+	assert(componentP != nullptr && "ComponentHandle is invalid");
 	return *componentP;
 }
 
 template<typename ComponentType>
-const ComponentType &ComponentPointer<ComponentType>::operator*() const
+const ComponentType &ComponentHandle<ComponentType>::operator*() const
 {
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
-	assert(componentP != nullptr && "ComponentPointer is invalid");
+	assert(componentP != nullptr && "ComponentHandle is invalid");
 	return *componentP;
 }
 
 template<typename ComponentType>
-ComponentType *ComponentPointer<ComponentType>::operator->()
+ComponentType *ComponentHandle<ComponentType>::operator->()
 {
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
-	assert(id.IsAlive() && componentP && " ComponentPointer is invalid");
+	assert(id.IsAlive() && componentP && " ComponentHandle is invalid");
 	
 	return componentP;
 }
 
 template<typename ComponentType>
-const ComponentType *ComponentPointer<ComponentType>::operator->() const
+const ComponentType *ComponentHandle<ComponentType>::operator->() const
 {
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
-	assert(id.IsAlive() && componentP != nullptr && "ComponentPointer is invalid");
+	assert(id.IsAlive() && componentP != nullptr && "ComponentHandle is invalid");
 	
 	return componentP;
 }
 
 template<typename ComponentType>
-bool ComponentPointer<ComponentType>::IsValid() const
+bool ComponentHandle<ComponentType>::IsValid() const
 {
 	return id.IsAlive() && (_manager->GetComponentDirect<ComponentType>(id));
 }
@@ -250,7 +259,7 @@ bool ComponentPointer<ComponentType>::IsValid() const
 ////////////////////////////////////////////////////////
 
 template<typename ComponentType>
-ComponentPointer<ComponentType> ECSManager::AddComponent(EntityID id)
+ComponentHandle<ComponentType> ECSManager::AddComponent(EntityID id)
 {
 	static_assert(std::is_base_of_v<ComponentData, ComponentType>,
 	              "ComponentType has to derive from ComponentData!");
@@ -264,22 +273,24 @@ ComponentPointer<ComponentType> ECSManager::AddComponent(EntityID id)
 		
 		// check if a component belonging to the id already exists in the ComponentVector
 		if (pComponents->Contains(id))
-			return ComponentPointer<ComponentType>(id, *this);
+			return ComponentHandle<ComponentType>(id, *this);
 		
 		pComponents->AddComponent(id);
 		
 		NotifyOnAdd(componentTypeId, id);
-		return ComponentPointer<ComponentType>(id, *this);
+		return ComponentHandle<ComponentType>(id, *this);
+	} else
+	{
+		// else we need to add the type to componentVectors
+		auto *createdComponents = new ComponentVector<ComponentType>();
+		createdComponents->manager = this;
+		_componentVectors.insert(std::pair(componentTypeId, static_cast<ComponentVectorBase *>(createdComponents)));
+		
+		createdComponents->AddComponent(id);
+		
+		NotifyOnAdd(componentTypeId, id);
+		return ComponentHandle<ComponentType>(id, *this);
 	}
-	
-	// else we need to add the type to componentVectors
-	auto *createdComponents = new ComponentVector<ComponentType>();
-	_componentVectors.insert(std::pair(componentTypeId, static_cast<ComponentVectorBase *>(createdComponents)));
-	
-	createdComponents->AddComponent(id);
-	
-	NotifyOnAdd(componentTypeId, id);
-	return ComponentPointer<ComponentType>(id, *this);
 }
 
 template<typename ComponentType>
@@ -304,9 +315,9 @@ ComponentType *ECSManager::GetComponentDirect(EntityID id)
 }
 
 template<typename ComponentType>
-ComponentPointer<ComponentType> ECSManager::GetComponent(EntityID id)
+ComponentHandle<ComponentType> ECSManager::GetComponent(EntityID id)
 {
-	return ComponentPointer<ComponentType>(id, *this);
+	return ComponentHandle<ComponentType>(id, *this);
 }
 
 template<typename ComponentType>

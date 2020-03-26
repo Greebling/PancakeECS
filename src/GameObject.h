@@ -47,7 +47,7 @@ public:
 	/// \tparam ComponentType
 	/// \return A pointer to the component
 	template<typename ComponentType>
-	ComponentPointer<ComponentType> Component()
+	ComponentHandle<ComponentType> Component()
 	{
 		static_assert(std::is_base_of_v<ComponentData, ComponentType>,
 		              "ComponentType has to derive from ComponentData!");
@@ -61,7 +61,7 @@ public:
 	/// \param id Owner of the Component
 	/// \return A pointer to the component
 	template<typename ComponentType>
-	ComponentPointer<ComponentType> AddComponent()
+	ComponentHandle<ComponentType> AddComponent()
 	{
 		
 		return manager.AddComponent<ComponentType>(_id);

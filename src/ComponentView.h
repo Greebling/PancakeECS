@@ -68,8 +68,8 @@ protected:
 	/// \param indices The indices used for ComponentTypes...
 	/// \param seq  The integer sequence with length equal to sizeOf...(ComponentTypes)
 	template<size_t... Is>
-	constexpr inline void ApplyFunction(const std::function<void(ComponentTypes &...)> &func,
-	                                    const std::tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
+	constexpr inline void ApplyFunction(const function<void(ComponentTypes &...)> &func,
+	                                    const tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
 	                                    const vector<IndexType> &indices,
 	                                    const index_sequence<Is...> seq)
 	{

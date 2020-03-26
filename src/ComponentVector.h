@@ -57,6 +57,8 @@ public:
 		delete _components;
 		delete entityIndex;
 	}
+	
+	ECSManager* manager{nullptr};
 
 private:
 	template<typename ...>
@@ -76,6 +78,7 @@ public:
 		
 		_components->push_back(ComponentType());
 		_components->back().id = id;
+		_components->back().manager = manager;
 		
 		return _components->back();
 	}
