@@ -10,8 +10,7 @@ set(SOURCE_FILES src/ECSManager.cpp src/ECSManager.h
         src/TypeId.h
         src/Scene.cpp src/Scene.h
         src/ComponentViewBase.h
-        src/Entity.h
-        main.cpp)
+        src/Entity.h)
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 #add_executable(${PROJECT_NAME} ${SOURCE_FILES})
