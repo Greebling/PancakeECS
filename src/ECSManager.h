@@ -25,7 +25,7 @@ struct ComponentHandle
 	
 	explicit ComponentHandle(ECSManager &manager);
 	
-	explicit ComponentHandle(ComponentType &component);
+	explicit ComponentHandle(const ComponentType &component);
 	
 	ComponentHandle(const ComponentHandle &pointer);
 	
@@ -182,7 +182,7 @@ ComponentHandle<ComponentType>::ComponentHandle(ECSManager &manager)
 }
 
 template<typename ComponentType>
-ComponentHandle<ComponentType>::ComponentHandle(ComponentType &component)
+ComponentHandle<ComponentType>::ComponentHandle(const ComponentType &component)
 		:id(component.id)
 		 , _manager(*component.manager)
 {
