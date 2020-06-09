@@ -2,6 +2,16 @@
 #include "ECSManager.h"
 
 
+ECSManager::~ECSManager()
+{
+	for (auto ComponentVector : _componentVectors)
+	{
+		delete ComponentVector.second;
+	}
+	
+	delete _deletedIndices;
+}
+
 Entity *ECSManager::GetEntity(EntityID id)
 {
 	if (id.Salt() == 0 || id.Index() == 0)
@@ -83,16 +93,6 @@ bool ECSManager::DestroyEntity(EntityID id)
 	_deletedIndices->push_back(id.Index());
 	
 	return true;
-}
-
-ECSManager::~ECSManager()
-{
-	for (auto ComponentVector : _componentVectors)
-	{
-		// delete the componentVector part
-		delete ComponentVector.second;
-	}
-	delete _deletedIndices;
 }
 
 void ECSManager::RegisterComponentSystem(ComponentViewBase *system, const std::vector<ComponentId> &componentIds)
