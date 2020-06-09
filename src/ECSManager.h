@@ -33,8 +33,8 @@ struct ComponentHandle
 	
 	[[nodiscard]] bool IsValid() const;
 	
-	/// Not recommended to use this as a raw pointer to a component might be i
-	/// invalidated by adding new components of the same type
+	/// It is not recommended to use this as a raw pointer to a component as it might be
+	/// invalidated by adding new components of the same type to the ecs manager
 	/// \return A pointer to the actual memory location of the component
 	ComponentType *RawPointer();
 	
