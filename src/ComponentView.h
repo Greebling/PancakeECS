@@ -10,8 +10,6 @@
 #include "ComponentViewBase.h"
 #include "Scene.h"
 
-using namespace std;
-
 enum class UpdateType
 {
 	Automatic, Manual
@@ -51,7 +49,7 @@ public:
 	/// \param func
 	void Parallel_foreach(std::function<void(ComponentTypes &...)> func, int minSize = 256);
 	
-	size_t Size();
+	std::size_t Size();
 
 protected:
 	/// Checks if this ComponentView is interested in the given ComponentID meaning
@@ -65,15 +63,15 @@ protected:
 	/// \tparam Is List of Integers deducted from seq
 	/// \param func The function the parameters shall be applied
 	/// \param ComponentVectors The componentVectors containing the ComponentTypes
-	/// \param indices The indices used for ComponentTypes...
+	/// \param startIndex The index where the componentIndex list of the current entity begins
 	/// \param seq  The integer sequence with length equal to sizeOf...(ComponentTypes)
 	template<size_t... Is>
-	constexpr inline void ApplyFunction(const function<void(ComponentTypes &...)> &func,
-	                                    const tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
-	                                    const vector<IndexType> &indices,
-	                                    const index_sequence<Is...> seq)
+	constexpr inline void ApplyFunction(const std::function<void(ComponentTypes &...)> &func,
+	                                    const std::tuple<ComponentVector<ComponentTypes> &...> &ComponentVectors,
+	                                    IndexType startIndex,
+	                                    const std::index_sequence<Is...> seq) const
 	{
-		func((get<Is>(ComponentVectors)[indices[Is]])...);
+		func((std::get<Is>(ComponentVectors)[(*_vectoredEntities)[startIndex + Is]])...);
 	}
 
 protected:
@@ -82,12 +80,13 @@ protected:
 	ECSManager &_manager;
 	
 	/// The ComponentIds of the types the ComponentView is interested in
-	vector<ComponentId> _operatingTypes;
+	std::vector<ComponentId> _operatingTypes;
 	
 	/// Maps EntityID to the indices of its components in the respective ComponentVectors
 	tsl::robin_map<EntityID, IndexType> *_registeredEntities{};
 	
-	vector<vector<IndexType>> *_vectoredEntities{};
+	// saves the indices of the components of an entity behind next to each other
+	std::vector<IndexType> *_vectoredEntities{};
 	
 	mutable std::condition_variable suspendCV{};
 };
@@ -131,11 +130,9 @@ void ComponentView<ComponentTypes...>::OnComponentAdded(ComponentId type, Entity
 	if (_registeredEntities->count(id))
 		return;
 	
-	vector<IndexType> entityIndices{_manager.GetComponents<ComponentTypes>()->IndexOf(id)...};
 	
-	
-	_vectoredEntities->push_back(entityIndices);
-	_registeredEntities->insert(pair(id, _vectoredEntities->size() - 1));
+	_registeredEntities->insert(std::pair(id, _vectoredEntities->size() - 1));
+	( _vectoredEntities->push_back(_manager.GetComponents<ComponentTypes>()->IndexOf(id)), ...);
 }
 
 template<typename... ComponentTypes>
@@ -152,14 +149,28 @@ void ComponentView<ComponentTypes...>::OnComponentRemoved(ComponentId type, Enti
 	IndexType componentVectorIndex = (*_registeredEntities)[id];
 	
 	
-	if (componentVectorIndex == _vectoredEntities->size() - 1) // special case when we remove the last thing
+	if (componentVectorIndex ==
+	    _vectoredEntities->size() - (1 + sizeof...(ComponentTypes))) // special case when we remove the last thing
 	{
-		_vectoredEntities->pop_back();
+		for (int j = 0; j < sizeof...(ComponentTypes); ++j)
+		{
+			_vectoredEntities->pop_back();
+		}
 	} else
 	{
 		// swap last and to be deleted position
-		(*_vectoredEntities)[componentVectorIndex] = (*_vectoredEntities)[_vectoredEntities->size() - 1];
-		_vectoredEntities->pop_back();
+		const std::size_t startIndex = _vectoredEntities->size() - (1 + sizeof...(ComponentTypes));
+		const std::size_t endIndex = _vectoredEntities->size() - 1;
+		for (std::size_t i = startIndex; i < endIndex; ++i)
+		{
+			(*_vectoredEntities)[i - sizeof...(ComponentTypes)] = (*_vectoredEntities)[i];
+		}
+		
+		// remove last component indices
+		for (int j = 0; j < sizeof...(ComponentTypes); ++j)
+		{
+			_vectoredEntities->pop_back();
+		}
 	}
 	
 	_registeredEntities->erase(id);
@@ -180,15 +191,15 @@ bool ComponentView<ComponentTypes...>::IsInterested(ComponentId type)
 template<typename... ComponentTypes>
 void ComponentView<ComponentTypes...>::Foreach(const std::function<void(ComponentTypes &...)> func)
 {
-	constexpr auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
 	
 	// the componentVectors the iterate over
 	std::tuple<ComponentVector<ComponentTypes> &...> compVectors{*_manager.GetComponents<ComponentTypes>()...};
 	
 	
-	for (const vector<IndexType> &currVec : (*_vectoredEntities))
+	constexpr auto seq = std::make_index_sequence<sizeof...(ComponentTypes)>();
+	for (std::size_t i = 0; i < _vectoredEntities->size() / sizeof...(ComponentTypes); i += sizeof...(ComponentTypes))
 	{
-		ApplyFunction(func, compVectors, currVec, seq);
+		ApplyFunction(func, compVectors, i, seq);
 	}
 }
 
@@ -197,7 +208,7 @@ void
 ComponentView<ComponentTypes...>::Parallel_foreach(std::function<void(ComponentTypes &...)> func, const int minSize)
 {
 	// check if it actually makes sense to use parallel execution, depending on the input size
-	size_t vectorSize = _vectoredEntities->size();
+	size_t vectorSize = _vectoredEntities->size() / sizeof...(ComponentTypes);
 	
 	if (vectorSize < minSize)
 	{
@@ -208,7 +219,7 @@ ComponentView<ComponentTypes...>::Parallel_foreach(std::function<void(ComponentT
 	
 	// use multi threaded implementation
 	int nThreads = static_cast<int>(std::thread::hardware_concurrency());
-	atomic_int nDone = 0;
+	std::atomic_int nDone = 0;
 	
 	std::mutex mutex;
 	std::unique_lock<std::mutex> lock(mutex);
@@ -217,19 +228,15 @@ ComponentView<ComponentTypes...>::Parallel_foreach(std::function<void(ComponentT
 	std::tuple<ComponentVector<ComponentTypes> &...> compVectors{*_manager.GetComponents<ComponentTypes>()...};
 	for (int j = 0; j < nThreads; ++j)
 	{
-		int start = j * (vectorSize / nThreads);
-		int end = std::min((j + 1) * (vectorSize / nThreads), vectorSize);
+		std::size_t start = j * (vectorSize / nThreads);
+		std::size_t end = std::min((j + 1) * (vectorSize / nThreads), vectorSize);
 		
 		tPool.push([&](int id)
 		           {
-			           constexpr auto seq = make_index_sequence<sizeof...(ComponentTypes)>();
-			
-			
-			           for (int i = start; i < end; ++i)
+			           constexpr auto seq = std::make_index_sequence<sizeof...(ComponentTypes)>();
+			           for (std::size_t i = start; i < end; ++i)
 			           {
-				           auto &currVec = (*_vectoredEntities)[i];
-				
-				           ApplyFunction(func, compVectors, currVec, seq);
+				           ApplyFunction(func, compVectors, i, seq);
 			           }
 			
 			
@@ -255,7 +262,7 @@ void ComponentView<ComponentTypes...>::Update()
 	delete _registeredEntities;
 	
 	// init data structures
-	_vectoredEntities = new vector<vector<IndexType>>();
+	_vectoredEntities = new std::vector<IndexType>();
 	_vectoredEntities->reserve(16);
 	
 	_registeredEntities = new tsl::robin_map<EntityID, IndexType>();
@@ -286,7 +293,7 @@ void ComponentView<ComponentTypes...>::Update()
 			}
 		}
 		
-		for (const std::pair<const EntityID, IndexType> &currPair : startComponents->getEntities())
+		for (const auto &currPair : startComponents->getEntities())
 		{
 			std::vector<IndexType> componentIndices = std::vector<IndexType>();
 			componentIndices.reserve(_operatingTypes.size());
@@ -309,7 +316,11 @@ void ComponentView<ComponentTypes...>::Update()
 				continue;
 			
 			// register this id with componentIndices
-			_vectoredEntities->push_back(componentIndices);
+			for (IndexType currIndex : componentIndices)
+			{
+				_vectoredEntities->push_back(currIndex);
+			}
+			
 			_registeredEntities->insert(std::pair(currPair.first, _vectoredEntities->size() - 1));
 		}
 	}
