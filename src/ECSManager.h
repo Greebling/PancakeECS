@@ -198,6 +198,7 @@ ComponentHandle<ComponentType>::ComponentHandle(const ComponentHandle &pointer)
 template<typename ComponentType>
 ComponentType *ComponentHandle<ComponentType>::RawPointer()
 {
+	assert(id.IsAlive() && "ID was not in use");
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
@@ -209,6 +210,7 @@ ComponentType *ComponentHandle<ComponentType>::RawPointer()
 template<typename ComponentType>
 ComponentType &ComponentHandle<ComponentType>::operator*()
 {
+	assert(id.IsAlive() && "ID was not in use");
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
@@ -219,7 +221,8 @@ ComponentType &ComponentHandle<ComponentType>::operator*()
 template<typename ComponentType>
 const ComponentType &ComponentHandle<ComponentType>::operator*() const
 {
-	assert(_manager && "Manager must be set!");
+	assert(id.IsAlive() && "ID was not in use");
+	assert(_manager && "No ECS Manager found");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
 	assert(componentP != nullptr && "ComponentHandle is invalid");
@@ -229,7 +232,8 @@ const ComponentType &ComponentHandle<ComponentType>::operator*() const
 template<typename ComponentType>
 ComponentType *ComponentHandle<ComponentType>::operator->()
 {
-	assert(_manager && "Manager must be set!");
+	assert(id.IsAlive() && "ID was not in use");
+	assert(_manager && "No ECS Manager found");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
 	assert(id.IsAlive() && componentP && " ComponentHandle is invalid");
@@ -240,6 +244,7 @@ ComponentType *ComponentHandle<ComponentType>::operator->()
 template<typename ComponentType>
 const ComponentType *ComponentHandle<ComponentType>::operator->() const
 {
+	assert(id.IsAlive() && "ID was not in use");
 	assert(_manager && "Manager must be set!");
 	
 	ComponentType *componentP = _manager->GetComponentDirect<ComponentType>(id);
