@@ -16,22 +16,24 @@ public:
 	GameObject()
 			: scene(*Scene::ACTIVE_SCENE)
 			  , manager(Scene::ACTIVE_SCENE->manager)
-			  , _id(Scene::ACTIVE_SCENE->manager.AddEntity())
-	{
-		assert(Scene::ACTIVE_SCENE != nullptr && "A scene must be active before instantiating a GameObject");
-	}
-	
-	
-	explicit GameObject(Scene &scene)
-			: scene(scene)
-			  , manager(scene.manager)
-			  , _id(scene.manager.AddEntity())
 	{
 	}
 	
 	virtual ~GameObject()
 	{
-		manager.DestroyEntity(_id);
+		if (_id.IsAlive())
+			manager.DestroyEntity(_id);
+	}
+	
+	void Spawn(Scene &spawningScene = *Scene::ACTIVE_SCENE)
+	{
+		assert(!_id.IsAlive());
+		
+		scene = spawningScene;
+		manager = scene.manager;
+		_id = manager.AddEntity();
+		
+		OnSpawn();
 	}
 	
 	
@@ -52,6 +54,8 @@ public:
 		static_assert(std::is_base_of_v<ComponentData, ComponentType>,
 		              "ComponentType has to derive from ComponentData!");
 		
+		assert(_id.IsAlive()); // GameObject has not been spawned!
+		
 		return manager.GetComponent<ComponentType>(_id);
 	}
 	
@@ -63,8 +67,13 @@ public:
 	template<typename ComponentType>
 	ComponentHandle<ComponentType> AddComponent()
 	{
-		
+		assert(_id.IsAlive()); // GameObject has not been spawned!
 		return manager.AddComponent<ComponentType>(_id);
+	}
+
+protected:
+	virtual void OnSpawn()
+	{
 	}
 
 protected:
@@ -75,5 +84,5 @@ protected:
 	Scene &scene;
 
 private:
-	const EntityID _id;
+	EntityID _id;
 };
