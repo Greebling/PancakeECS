@@ -25,8 +25,6 @@ public:
 	/// Adds a ComponentView in the currently active scene
 	ComponentView();
 	
-	~ComponentView();
-	
 	/// Adds the id to the ComponentView if it owns all interesting components
 	/// \param type The ComponentId of the components type that was added
 	/// \param id The EntityID to which the component was added
@@ -83,10 +81,10 @@ protected:
 	std::vector<ComponentId> _operatingTypes;
 	
 	/// Maps EntityID to the indices of its components in the respective ComponentVectors
-	tsl::robin_map<EntityID, IndexType> *_registeredEntities{};
+	std::unique_ptr<tsl::robin_map<EntityID, IndexType>> _registeredEntities{};
 	
 	// saves the indices of the components of an entity behind next to each other
-	std::vector<IndexType> *_vectoredEntities{};
+	std::unique_ptr<std::vector<IndexType> > _vectoredEntities{};
 	
 	mutable std::condition_variable suspendCV{};
 };
@@ -105,6 +103,11 @@ ComponentView<ComponentTypes...>::ComponentView(ECSManager &manager)
 		:_manager(manager)
 {
 	_operatingTypes = {TypeId<ComponentTypes>::GetId()...};
+	
+	_vectoredEntities = std::make_unique<std::vector<IndexType>>();
+	_vectoredEntities->reserve(16);
+	
+	_registeredEntities = std::make_unique<tsl::robin_map<EntityID, IndexType>>();
 	
 	// register in entity system with types
 	_manager.RegisterComponentSystem(this, _operatingTypes);
@@ -258,14 +261,11 @@ size_t ComponentView<ComponentTypes...>::Size()
 template<typename... ComponentTypes>
 void ComponentView<ComponentTypes...>::Update()
 {
-	delete _vectoredEntities;
-	delete _registeredEntities;
-	
 	// init data structures
-	_vectoredEntities = new std::vector<IndexType>();
+	_vectoredEntities->clear();
 	_vectoredEntities->reserve(16);
 	
-	_registeredEntities = new tsl::robin_map<EntityID, IndexType>();
+	_registeredEntities->clear();
 	
 	
 	// look for already registered components in the system
@@ -324,11 +324,4 @@ void ComponentView<ComponentTypes...>::Update()
 			_registeredEntities->insert(std::pair(currPair.first, _vectoredEntities->size() - 1));
 		}
 	}
-}
-
-template<typename... ComponentTypes>
-ComponentView<ComponentTypes...>::~ComponentView()
-{
-	delete _vectoredEntities;
-	delete _registeredEntities;
 }
